@@ -56,7 +56,7 @@
     /* ── LOGO (left-center, no text around it) ── */
     .brand {
       position: fixed;
-      left: clamp(48px, 5.5vw, 88px);
+      left: clamp(312px, 26vw, 380px);
       top: 50%;
       transform: translateY(-50%);
       z-index: 20;
@@ -78,8 +78,9 @@
       opacity: 0;
       transform: translateX(-22px);
       filter:
-        drop-shadow(0 4px 24px rgba(0,0,0,0.32))
-        drop-shadow(0 1px  6px rgba(0,0,0,0.18));
+        drop-shadow(0 0 42px rgba(0,0,0,0.55))
+        drop-shadow(0 0 18px rgba(0,0,0,0.40))
+        drop-shadow(0 6px 14px rgba(0,0,0,0.30));
       transition:
         opacity   2s   cubic-bezier(0.16, 1, 0.3, 1),
         transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
