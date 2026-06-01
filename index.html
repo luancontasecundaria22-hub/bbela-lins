@@ -12,14 +12,64 @@
 
     :root {
       --terracotta: #c4896a;
-      --cream: #f5efe8;
+      --cream:      #f5efe8;
     }
 
     html, body {
-      width: 100%;
-      overflow-x: hidden;
-      background: #0d0b09;
+      width: 100%; height: 100%;
+      overflow: hidden; /* hero is full-screen, no scroll needed */
+      background: #e8ddd0;
       font-family: 'Montserrat', sans-serif;
+    }
+
+    /* ── KEN BURNS ── */
+    /* Both scenes share the same animation so they stay in sync
+       during the crossfade — the blend looks like one continuous shot. */
+    @keyframes kb {
+      from { transform: scale(1.00) translate(0%,    0%);    }
+      to   { transform: scale(1.07) translate(-0.9%, -0.5%); }
+    }
+
+    /* ── SCENES ── */
+    .scene {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center top;
+      animation: kb 24s ease-in-out infinite alternate;
+    }
+
+    #s-empty { z-index: 1; }
+
+    /* Woman scene starts invisible; JS fades it in after a beat */
+    #s-woman {
+      z-index: 2;
+      opacity: 0;
+    }
+
+    /* ── OVERLAYS ── */
+    .grad-top {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 28%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.28), transparent);
+      z-index: 10; pointer-events: none;
+    }
+
+    .grad-bot {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 46%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+      z-index: 10; pointer-events: none;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 88% 78% at 50% 44%,
+                    transparent 28%, rgba(0,0,0,0.44) 100%);
+      z-index: 11; pointer-events: none;
     }
 
     /* ── NAV ── */
@@ -28,181 +78,65 @@
       top: 0; left: 0; right: 0;
       z-index: 100;
       padding: 28px 48px;
-      display: flex;
-      align-items: center;
       pointer-events: none;
     }
 
     .nav__logo {
-      height: 38px;
+      height: 36px;
       width: auto;
       opacity: 0;
+      filter: brightness(2.5) saturate(0.7);
       transition: opacity 1.6s ease;
-      filter: brightness(2.2) saturate(0.85);
     }
+    .nav__logo.visible { opacity: 0.85; }
 
-    .nav__logo.show { opacity: 0.88; }
-
-    /* ── SCROLL TRACK ── */
-    .scroll-track { height: 1050vh; }
-
-    /* ── STAGE ── */
-    .stage {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #0d0b09;
-    }
-
-    /* ── SCENES ── */
-    .scene {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: top center;
-      opacity: 0;
-      will-change: opacity, transform;
-    }
-
-    /* Ken Burns — varied pace, each scene drifts differently */
-    @keyframes kb0 { from { transform: scale(1.00) translate(  0%,    0%); } to { transform: scale(1.09) translate(-1.6%, -0.9%); } }
-    @keyframes kb1 { from { transform: scale(1.07) translate(-2.0%,  0%); } to { transform: scale(1.00) translate( 2.0%,  0.7%); } }
-    @keyframes kb2 { from { transform: scale(1.00) translate( 0.7%,  0%); } to { transform: scale(1.08) translate(-0.9%, -1.4%); } }
-    @keyframes kb3 { from { transform: scale(1.08) translate( 1.3%, -0.7%); } to { transform: scale(1.00) translate(-1.3%,  0.7%); } }
-    @keyframes kb4 { from { transform: scale(1.00) translate(-0.7%,  0%); } to { transform: scale(1.10) translate( 0.7%, -1.3%); } }
-    @keyframes kb5 { from { transform: scale(1.06) translate( 0%,  -0.7%); } to { transform: scale(1.00) translate( 0%,   0.7%); } }
-    @keyframes kb6 { from { transform: scale(1.00) translate( 0%,    0%); } to { transform: scale(1.08) translate(-1.1%, -1.1%); } }
-
-    #s0 { animation: kb0 20s ease-in-out infinite alternate; }
-    #s1 { animation: kb1 17s ease-in-out infinite alternate; }
-    #s2 { animation: kb2 22s ease-in-out infinite alternate; }
-    #s3 { animation: kb3 18s ease-in-out infinite alternate; }
-    #s4 { animation: kb4 21s ease-in-out infinite alternate; }
-    #s5 { animation: kb5 16s ease-in-out infinite alternate; }
-    #s6 { animation: kb6 24s ease-in-out infinite alternate; }
-
-    .woman-layer {
-      position: absolute;
-      inset: 0;
-      background-image: url('images/hero.png.png');
-      background-size: cover;
-      background-position: top center;
-      opacity: 0;
-      will-change: opacity;
-      pointer-events: none;
-      animation: kb0 26s ease-in-out infinite alternate;
-    }
-
-    /* ── OVERLAYS ── */
-    .grad-top {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 32%;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.52), transparent);
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .grad-bot {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .vignette {
-      position: absolute;
-      inset: 0;
-      z-index: 11;
-      pointer-events: none;
-      background: radial-gradient(ellipse 90% 80% at 50% 42%, transparent 30%, rgba(0,0,0,0.52) 100%);
-    }
-
-    /* ── BRAND ── */
+    /* ── BRAND (bottom-left) ── */
     .brand {
-      position: absolute;
-      bottom: 72px;
+      position: fixed;
+      bottom: 68px;
       left: 56px;
       z-index: 20;
       pointer-events: none;
     }
 
     .brand__logo {
-      height: clamp(60px, 9vw, 100px);
-      width: auto;
       display: block;
+      height: clamp(56px, 8vw, 96px);
+      width: auto;
       opacity: 0;
-      transform: translateY(26px);
-      filter: brightness(2.2) saturate(0.85) drop-shadow(0 4px 24px rgba(0,0,0,0.55));
+      transform: translateY(22px);
+      filter: brightness(2.4) saturate(0.75)
+              drop-shadow(0 4px 20px rgba(0,0,0,0.4));
       transition:
-        opacity  2.0s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 2.2s cubic-bezier(0.16, 1, 0.3, 1),
-        filter   2.0s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity   2.2s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .brand__logo.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .brand__sub {
-      margin-top: 16px;
-      font-size: 0.58rem;
-      letter-spacing: 0.64em;
+      margin-top: 14px;
+      font-size: 0.56rem;
+      letter-spacing: 0.65em;
       color: var(--terracotta);
       font-weight: 200;
       text-transform: uppercase;
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(14px);
       transition:
-        opacity  2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.45s,
-        transform 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.45s;
+        opacity   2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
+        transform 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
     }
-
-    .brand.show .brand__logo {
+    .brand__sub.visible {
       opacity: 1;
       transform: translateY(0);
-    }
-
-    .brand.show .brand__sub {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── PROGRESS DOTS ── */
-    .progress {
-      position: fixed;
-      right: 32px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .dot {
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.18);
-      cursor: pointer;
-      transition: background 0.55s ease, transform 0.55s ease;
-      margin: 7px 0;
-    }
-
-    .dot.active {
-      background: var(--terracotta);
-      transform: scale(2.1);
-    }
-
-    .dot-line {
-      width: 1px;
-      height: 0;
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent);
-      display: none;
     }
 
     /* ── SCROLL CUE ── */
     .scroll-cue {
-      position: absolute;
+      position: fixed;
       bottom: 32px;
       left: 50%;
       transform: translateX(-50%);
@@ -215,35 +149,31 @@
       opacity: 0;
       transition: opacity 1.4s ease;
     }
-
-    .scroll-cue.show { opacity: 0.48; }
+    .scroll-cue.visible { opacity: 0.45; }
 
     .scroll-cue__label {
-      font-size: 0.5rem;
-      letter-spacing: 0.6em;
+      font-size: 0.48rem;
+      letter-spacing: 0.62em;
       color: var(--cream);
       text-transform: uppercase;
     }
 
     .scroll-cue__track {
       width: 1px;
-      height: 52px;
-      background: rgba(255,255,255,0.14);
+      height: 50px;
+      background: rgba(255,255,255,0.15);
       position: relative;
       overflow: hidden;
     }
-
     .scroll-cue__track::after {
       content: '';
       position: absolute;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.9), transparent);
+      top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent,
+                  rgba(255,255,255,0.88), transparent);
       animation: drip 2.6s ease-in-out infinite;
     }
-
     @keyframes drip {
       0%   { top: -100%; opacity: 0; }
       10%  { opacity: 1; }
@@ -255,180 +185,85 @@
     svg.grain {
       position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       z-index: 49;
       pointer-events: none;
       mix-blend-mode: overlay;
-      animation: grain-shift 0.45s steps(2) infinite;
+      animation: grain-shift 0.42s steps(2) infinite;
     }
-
     @keyframes grain-shift {
-      0%   { transform: translate(0px,  0px) scale(1.01); }
-      50%  { transform: translate(-5px, -7px) scale(1.0);  }
-      100% { transform: translate(7px,  4px) scale(1.02); }
+      0%   { transform: translate(0px,   0px)  scale(1.01); }
+      50%  { transform: translate(-4px, -6px)  scale(1.00); }
+      100% { transform: translate( 6px,  3px)  scale(1.02); }
     }
   </style>
 </head>
 <body>
 
+  <!-- Scene 1: empty room -->
+  <div class="scene" id="s-empty"
+       style="background-image: url('images/scene-empty.jpg')"></div>
+
+  <!-- Scene 2: woman enters -->
+  <div class="scene" id="s-woman"
+       style="background-image: url('images/scene-woman.jpg')"></div>
+
+  <div class="grad-top"></div>
+  <div class="grad-bot"></div>
+  <div class="vignette"></div>
+
   <nav class="nav">
     <img class="nav__logo" id="navLogo" src="images/logo-mark.png" alt="BBELA LINS">
   </nav>
 
-  <div class="scroll-track"></div>
-
-  <div class="stage">
-
-    <div class="scene" id="s0" style="background-image: url('images/hero.png.png')"></div>
-    <div class="scene" id="s1" style="background-image: url('images/beach1.png.png')"></div>
-    <div class="scene" id="s2" style="background-image: url('images/beach2.png.png')"></div>
-    <div class="scene" id="s3" style="background-image: url('images/beach3.png.png')"></div>
-    <div class="scene" id="s4" style="background-image: url('images/beach4.png.png')"></div>
-    <div class="scene" id="s5" style="background-image: url('images/beach5.png.png')"></div>
-    <div class="scene" id="s6" style="background-image: url('images/beach6.png.png')"></div>
-
-    <div class="woman-layer" id="womanLayer"></div>
-
-    <div class="grad-top"></div>
-    <div class="grad-bot"></div>
-    <div class="vignette"></div>
-
-    <div class="brand" id="brand">
-      <img class="brand__logo" src="images/logo.png" alt="BBELA LINS">
-      <p class="brand__sub">siga os passos</p>
-    </div>
-
-    <div class="scroll-cue" id="scrollCue">
-      <span class="scroll-cue__label">scroll</span>
-      <div class="scroll-cue__track"></div>
-    </div>
-
-    <div class="progress" id="progressDots"></div>
-
+  <div class="brand" id="brand">
+    <img class="brand__logo" id="brandLogo" src="images/logo.png" alt="BBELA LINS">
+    <p class="brand__sub" id="brandSub">siga os passos</p>
   </div>
 
-  <!-- Film grain overlay -->
+  <div class="scroll-cue" id="scrollCue">
+    <span class="scroll-cue__label">scroll</span>
+    <div class="scroll-cue__track"></div>
+  </div>
+
+  <!-- Film grain -->
   <svg class="grain" xmlns="http://www.w3.org/2000/svg">
-    <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%"
+    <filter id="gf" x="0%" y="0%" width="100%" height="100%"
             color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="0.78" numOctaves="4"
-                    stitchTiles="stitch" result="noise"/>
-      <feColorMatrix type="saturate" values="0" in="noise" result="mono"/>
-      <feBlend in="SourceGraphic" in2="mono" mode="overlay" result="blended"/>
-      <feComposite in="blended" in2="SourceGraphic" operator="in"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.76"
+                    numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise"/>
     </filter>
-    <rect width="100%" height="100%" filter="url(#grain-filter)" opacity="0.055"/>
+    <rect width="100%" height="100%" filter="url(#gf)" opacity="0.05"/>
   </svg>
 
   <script>
-    const SCENE_COUNT  = 7;
-    const VH           = () => window.innerHeight;
-    const SCROLL_PER_SCENE = () => VH() * 1.5;
-
-    const scenes    = Array.from({ length: SCENE_COUNT }, (_, i) => document.getElementById(`s${i}`));
-    const womanLayer = document.getElementById('womanLayer');
-    const brand      = document.getElementById('brand');
-    const navLogo    = document.getElementById('navLogo');
-    const scrollCue  = document.getElementById('scrollCue');
-    const dotsEl     = document.getElementById('progressDots');
-
-    // Build progress dots
-    const dots = scenes.map((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'dot';
-      d.title = `Cena ${i + 1}`;
-      d.addEventListener('click', () => {
-        window.scrollTo({ top: i * SCROLL_PER_SCENE(), behavior: 'smooth' });
-      });
-      dotsEl.appendChild(d);
-      return d;
-    });
-
-    // ── Easing helpers ──────────────────────────────────────────────────────
-    const clamp      = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-    // Smootherstep C² (Perlin) — no abrupt start/end
-    const smoothstep = t => t * t * t * (t * (t * 6 - 15) + 10);
-
-    // ── Lerped scroll ───────────────────────────────────────────────────────
-    let targetScroll = 0;
-    let smoothScroll = 0;
-    const LERP_FACTOR = 0.065;
-
-    // Crossfade zone: what fraction of each scroll unit is the transition.
-    // 0.55 means the last 45% of scrolling toward the next scene is the dissolve.
-    // Raising this makes transitions longer/gentler.
-    const XFADE = 0.52;
-
-    function renderFrame(scrollY) {
-      const sps = SCROLL_PER_SCENE();
-      // Clamp so we never go past the last scene
-      const pos  = clamp(scrollY / sps, 0, SCENE_COUNT - 0.001);
-
-      const curr = Math.min(Math.floor(pos), SCENE_COUNT - 1);
-      const next = Math.min(curr + 1, SCENE_COUNT - 1);
-      const t    = pos - curr; // 0→1 within current scroll unit
-
-      // blend: 0 = all curr, 1 = all next
-      // Crossfade only starts after XFADE fraction of scroll
-      const blend = t < (1 - XFADE)
-        ? 0
-        : smoothstep((t - (1 - XFADE)) / XFADE);
-
-      // TRUE cross-dissolve: curr + next opacity always = 1
-      // No dark gap between scenes ever.
-      scenes.forEach((scene, i) => {
-        let op = 0;
-        if (i === curr) op = 1 - blend;
-        if (i === next) op += blend; // += handles curr === next (last scene)
-        scene.style.opacity = op;
-      });
-
-      // Woman/hero overlay — ride along with scene 0 dissolve
-      const s0op = curr === 0 ? (1 - blend) : 0;
-      womanLayer.style.opacity = s0op;
-
-      // Brand: follows scene 0, lingers a little into scene 1
-      brand.style.opacity = clamp(s0op + blend * (curr === 0 ? 0.35 : 0), 0, 1);
-
-      // Scroll cue: only while still in scene 0 pre-transition
-      scrollCue.style.opacity = curr === 0 && t < (1 - XFADE)
-        ? clamp((1 - t / (1 - XFADE)) * 0.48, 0, 0.48)
-        : 0;
-
-      // Active dot
-      dots.forEach((d, i) => d.classList.toggle('active', i === curr));
-    }
-
-    function tick() {
-      // Exponential approach — feels like inertia without overshoot
-      smoothScroll += (targetScroll - smoothScroll) * LERP_FACTOR;
-      renderFrame(smoothScroll);
-      requestAnimationFrame(tick);
-    }
-
-    window.addEventListener('scroll', () => {
-      targetScroll = window.scrollY;
-    }, { passive: true });
+    const woman    = document.getElementById('s-woman');
+    const navLogo  = document.getElementById('navLogo');
+    const brandLogo = document.getElementById('brandLogo');
+    const brandSub  = document.getElementById('brandSub');
+    const scrollCue = document.getElementById('scrollCue');
 
     window.addEventListener('load', () => {
-      targetScroll = window.scrollY;
-      smoothScroll = window.scrollY;
 
-      // Kick off the perpetual render loop
-      requestAnimationFrame(tick);
-
-      // Initial state
-      scenes[0].style.opacity  = 1;
-      womanLayer.style.opacity = 1;
-
-      // Staggered reveals
+      // 1. Logo and brand appear shortly after load
       setTimeout(() => {
-        navLogo.classList.add('show');
-        brand.classList.add('show');
-      }, 480);
+        navLogo.classList.add('visible');
+        brandLogo.classList.add('visible');
+        brandSub.classList.add('visible');
+      }, 400);
 
-      setTimeout(() => scrollCue.classList.add('show'), 2600);
+      // 2. Woman dissolves in — same Ken Burns offset, seamless blend
+      setTimeout(() => {
+        woman.style.transition = 'opacity 3.2s ease';
+        woman.style.opacity    = '1';
+      }, 2000);
+
+      // 3. Scroll cue appears after the reveal is complete
+      setTimeout(() => {
+        scrollCue.classList.add('visible');
+      }, 4500);
+
     });
   </script>
 
