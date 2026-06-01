@@ -346,52 +346,58 @@
     });
 
     // ── Easing helpers ──────────────────────────────────────────────────────
-    const clamp       = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-    // Smootherstep (Perlin's C² version) — softer than standard smoothstep
-    const smoothstep  = t => t * t * t * (t * (t * 6 - 15) + 10);
-    const fade        = (t, a, b) => smoothstep(clamp((t - a) / (b - a), 0, 1));
+    const clamp      = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+    // Smootherstep C² (Perlin) — no abrupt start/end
+    const smoothstep = t => t * t * t * (t * (t * 6 - 15) + 10);
 
     // ── Lerped scroll ───────────────────────────────────────────────────────
-    // The rendering tracks a smoothly interpolated scroll position so all
-    // cross-fades feel silky even during fast scrolling.
     let targetScroll = 0;
     let smoothScroll = 0;
-    const LERP_FACTOR = 0.072;
+    const LERP_FACTOR = 0.065;
+
+    // Crossfade zone: what fraction of each scroll unit is the transition.
+    // 0.55 means the last 45% of scrolling toward the next scene is the dissolve.
+    // Raising this makes transitions longer/gentler.
+    const XFADE = 0.52;
 
     function renderFrame(scrollY) {
-      const sps     = SCROLL_PER_SCENE();
-      const pos     = scrollY / sps;
-      const OVERLAP = 0.40; // longer overlap → more cinematic cross-dissolve
+      const sps = SCROLL_PER_SCENE();
+      // Clamp so we never go past the last scene
+      const pos  = clamp(scrollY / sps, 0, SCENE_COUNT - 0.001);
 
+      const curr = Math.min(Math.floor(pos), SCENE_COUNT - 1);
+      const next = Math.min(curr + 1, SCENE_COUNT - 1);
+      const t    = pos - curr; // 0→1 within current scroll unit
+
+      // blend: 0 = all curr, 1 = all next
+      // Crossfade only starts after XFADE fraction of scroll
+      const blend = t < (1 - XFADE)
+        ? 0
+        : smoothstep((t - (1 - XFADE)) / XFADE);
+
+      // TRUE cross-dissolve: curr + next opacity always = 1
+      // No dark gap between scenes ever.
       scenes.forEach((scene, i) => {
-        const enter = i - OVERLAP;
-        const exit  = i + 1 - OVERLAP;
-
         let op = 0;
-        if      (pos < enter) op = 0;
-        else if (pos < i)     op = fade(pos, enter, i);
-        else if (pos < exit)  op = 1;
-        else if (pos < i + 1) op = 1 - fade(pos, exit, i + 1);
-        else                  op = 0;
-
+        if (i === curr) op = 1 - blend;
+        if (i === next) op += blend; // += handles curr === next (last scene)
         scene.style.opacity = op;
       });
 
-      // Hero overlay: appears immediately, dissolves by the second scene
-      const womanOp = pos < 0.04
-        ? fade(pos, 0, 0.04)
-        : 1 - fade(pos, 0.12, 0.58);
-      womanLayer.style.opacity = clamp(womanOp, 0, 1);
+      // Woman/hero overlay — ride along with scene 0 dissolve
+      const s0op = curr === 0 ? (1 - blend) : 0;
+      womanLayer.style.opacity = s0op;
 
-      // Brand logo: stays longer, exits gracefully
-      brand.style.opacity = clamp(1 - fade(pos, 0.48, 1.15), 0, 1);
+      // Brand: follows scene 0, lingers a little into scene 1
+      brand.style.opacity = clamp(s0op + blend * (curr === 0 ? 0.35 : 0), 0, 1);
 
-      // Scroll cue
-      scrollCue.style.opacity = clamp((1 - fade(pos, 0, 0.32)) * 0.48, 0, 0.48);
+      // Scroll cue: only while still in scene 0 pre-transition
+      scrollCue.style.opacity = curr === 0 && t < (1 - XFADE)
+        ? clamp((1 - t / (1 - XFADE)) * 0.48, 0, 0.48)
+        : 0;
 
       // Active dot
-      const active = Math.min(Math.round(pos), SCENE_COUNT - 1);
-      dots.forEach((d, i) => d.classList.toggle('active', i === active));
+      dots.forEach((d, i) => d.classList.toggle('active', i === curr));
     }
 
     function tick() {
