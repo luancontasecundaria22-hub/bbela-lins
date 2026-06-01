@@ -4,27 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BBELA LINS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@100;200;300&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --terracotta: #c4896a;
-      --cream:      #f5efe8;
-    }
-
     html, body {
       width: 100%; height: 100%;
-      overflow: hidden; /* hero is full-screen, no scroll needed */
+      overflow: hidden;
       background: #e8ddd0;
-      font-family: 'Montserrat', sans-serif;
     }
 
-    /* ── KEN BURNS ── */
-    /* Both scenes share the same animation so they stay in sync
-       during the crossfade — the blend looks like one continuous shot. */
+    /* ── KEN BURNS ──
+       Same animation on both layers so they stay perfectly in sync
+       during the cross-dissolve — looks like one continuous camera move. */
     @keyframes kb {
       from { transform: scale(1.00) translate(0%,    0%);    }
       to   { transform: scale(1.07) translate(-0.9%, -0.5%); }
@@ -40,154 +31,71 @@
     }
 
     #s-empty { z-index: 1; }
-
-    /* Woman scene starts invisible; JS fades it in after a beat */
-    #s-woman {
-      z-index: 2;
-      opacity: 0;
-    }
+    #s-woman { z-index: 2; opacity: 0; }
 
     /* ── OVERLAYS ── */
     .grad-top {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 28%;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.28), transparent);
+      top: 0; left: 0; right: 0; height: 26%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.22), transparent);
       z-index: 10; pointer-events: none;
     }
-
     .grad-bot {
       position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 46%;
-      background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+      bottom: 0; left: 0; right: 0; height: 40%;
+      background: linear-gradient(to top, rgba(0,0,0,0.42), transparent);
       z-index: 10; pointer-events: none;
     }
-
     .vignette {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse 88% 78% at 50% 44%,
-                    transparent 28%, rgba(0,0,0,0.44) 100%);
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 90% 80% at 50% 44%,
+                    transparent 30%, rgba(0,0,0,0.36) 100%);
       z-index: 11; pointer-events: none;
     }
 
-    /* ── NAV ── */
-    .nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 28px 48px;
-      pointer-events: none;
-    }
-
-    .nav__logo {
-      height: 36px;
-      width: auto;
-      opacity: 0;
-      filter: brightness(2.5) saturate(0.7);
-      transition: opacity 1.6s ease;
-    }
-    .nav__logo.visible { opacity: 0.85; }
-
-    /* ── BRAND (bottom-left) ── */
+    /* ── LOGO (left-center, no text around it) ── */
     .brand {
       position: fixed;
-      bottom: 68px;
-      left: 56px;
+      left: 52px;
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 20;
       pointer-events: none;
+    }
+
+    /* Float animation runs on the wrapper so it doesn't conflict
+       with the img's appear transition */
+    @keyframes logo-float {
+      0%, 100% { transform: translateY(-50%);             }
+      50%       { transform: translateY(calc(-50% - 9px)); }
+    }
+    .brand.floating {
+      animation: logo-float 5.5s ease-in-out infinite;
     }
 
     .brand__logo {
       display: block;
-      height: clamp(56px, 8vw, 96px);
+      height: clamp(72px, 10vw, 110px);
       width: auto;
       opacity: 0;
-      transform: translateY(22px);
-      filter: brightness(2.4) saturate(0.75)
-              drop-shadow(0 4px 20px rgba(0,0,0,0.4));
+      transform: translateX(-18px);
+      /* Natural colours work well on the warm beige background;
+         drop-shadow gives just enough separation */
+      filter: drop-shadow(0 3px 18px rgba(0,0,0,0.22));
       transition:
-        opacity   2.2s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 2.4s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity   2s   cubic-bezier(0.16, 1, 0.3, 1),
+        transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .brand__logo.visible {
       opacity: 1;
-      transform: translateY(0);
-    }
-
-    .brand__sub {
-      margin-top: 14px;
-      font-size: 0.56rem;
-      letter-spacing: 0.65em;
-      color: var(--terracotta);
-      font-weight: 200;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(14px);
-      transition:
-        opacity   2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
-        transform 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
-    }
-    .brand__sub.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── SCROLL CUE ── */
-    .scroll-cue {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 1.4s ease;
-    }
-    .scroll-cue.visible { opacity: 0.45; }
-
-    .scroll-cue__label {
-      font-size: 0.48rem;
-      letter-spacing: 0.62em;
-      color: var(--cream);
-      text-transform: uppercase;
-    }
-
-    .scroll-cue__track {
-      width: 1px;
-      height: 50px;
-      background: rgba(255,255,255,0.15);
-      position: relative;
-      overflow: hidden;
-    }
-    .scroll-cue__track::after {
-      content: '';
-      position: absolute;
-      top: -100%; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(to bottom, transparent,
-                  rgba(255,255,255,0.88), transparent);
-      animation: drip 2.6s ease-in-out infinite;
-    }
-    @keyframes drip {
-      0%   { top: -100%; opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { top: 100%; opacity: 0; }
+      transform: translateX(0);
     }
 
     /* ── FILM GRAIN ── */
     svg.grain {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       width: 100%; height: 100%;
-      z-index: 49;
-      pointer-events: none;
+      z-index: 49; pointer-events: none;
       mix-blend-mode: overlay;
       animation: grain-shift 0.42s steps(2) infinite;
     }
@@ -200,11 +108,8 @@
 </head>
 <body>
 
-  <!-- Scene 1: empty room -->
   <div class="scene" id="s-empty"
        style="background-image: url('images/scene-empty.jpg')"></div>
-
-  <!-- Scene 2: woman enters -->
   <div class="scene" id="s-woman"
        style="background-image: url('images/scene-woman.jpg')"></div>
 
@@ -212,18 +117,10 @@
   <div class="grad-bot"></div>
   <div class="vignette"></div>
 
-  <nav class="nav">
-    <img class="nav__logo" id="navLogo" src="images/logo-mark.png" alt="BBELA LINS">
-  </nav>
-
+  <!-- Logo: left-center, PNG with transparent background, no text around -->
   <div class="brand" id="brand">
-    <img class="brand__logo" id="brandLogo" src="images/logo.png" alt="BBELA LINS">
-    <p class="brand__sub" id="brandSub">siga os passos</p>
-  </div>
-
-  <div class="scroll-cue" id="scrollCue">
-    <span class="scroll-cue__label">scroll</span>
-    <div class="scroll-cue__track"></div>
+    <img class="brand__logo" id="brandLogo"
+         src="images/logo.png" alt="BBELA LINS">
   </div>
 
   <!-- Film grain -->
@@ -234,35 +131,27 @@
                     numOctaves="4" stitchTiles="stitch" result="noise"/>
       <feColorMatrix type="saturate" values="0" in="noise"/>
     </filter>
-    <rect width="100%" height="100%" filter="url(#gf)" opacity="0.05"/>
+    <rect width="100%" height="100%" filter="url(#gf)" opacity="0.045"/>
   </svg>
 
   <script>
-    const woman    = document.getElementById('s-woman');
-    const navLogo  = document.getElementById('navLogo');
+    const woman     = document.getElementById('s-woman');
+    const brand     = document.getElementById('brand');
     const brandLogo = document.getElementById('brandLogo');
-    const brandSub  = document.getElementById('brandSub');
-    const scrollCue = document.getElementById('scrollCue');
 
     window.addEventListener('load', () => {
 
-      // 1. Logo and brand appear shortly after load
-      setTimeout(() => {
-        navLogo.classList.add('visible');
-        brandLogo.classList.add('visible');
-        brandSub.classList.add('visible');
-      }, 400);
+      // Logo slides in from the left shortly after load
+      setTimeout(() => brandLogo.classList.add('visible'), 350);
 
-      // 2. Woman dissolves in — same Ken Burns offset, seamless blend
+      // After the appear transition settles, start the float loop
+      setTimeout(() => brand.classList.add('floating'), 2700);
+
+      // Woman dissolves in — faster than before (800 ms delay, 2.5 s fade)
       setTimeout(() => {
-        woman.style.transition = 'opacity 3.2s ease';
+        woman.style.transition = 'opacity 2.5s ease';
         woman.style.opacity    = '1';
-      }, 2000);
-
-      // 3. Scroll cue appears after the reveal is complete
-      setTimeout(() => {
-        scrollCue.classList.add('visible');
-      }, 4500);
+      }, 800);
 
     });
   </script>
