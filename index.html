@@ -90,6 +90,32 @@
       transform: translateX(0);
     }
 
+    /* ── MOBILE: logo centered, anchored to bottom ── */
+    @media (max-width: 640px) {
+      .brand {
+        left: 50%;
+        top: auto;
+        bottom: 52px;
+        transform: translateX(-50%);
+      }
+
+      @keyframes logo-float-mobile {
+        0%, 100% { transform: translateX(-50%) translateY(0px);   }
+        50%       { transform: translateX(-50%) translateY(-10px); }
+      }
+      .brand.floating {
+        animation: logo-float-mobile 6s ease-in-out infinite;
+      }
+
+      .brand__logo {
+        height: clamp(130px, 52vw, 200px);
+        transform: translateY(18px); /* slides up instead of left */
+      }
+      .brand__logo.visible {
+        transform: translateY(0);
+      }
+    }
+
     /* ── FILM GRAIN ── */
     svg.grain {
       position: fixed; inset: 0;
